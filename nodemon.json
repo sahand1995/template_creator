@@ -1,0 +1,11 @@
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": ["node_modules", "*.test.js", "*.spec.js"],
+  "exec": "node src/server.js",
+  "verbose": true,
+  "delay": 1000,
+  "stdout": true,
+  "colours": true
+}
+
