@@ -1,0 +1,77 @@
+{
+  "event_name": "Wedding Celebration",
+  "event_type": "Wedding",
+  "event_date_time": "Saturday, 25th of April | 05:00 PM",
+  "venue_name": "Royal Albert Banquet",
+  "venue_address": "134 Maple Street, Newbury hills, California",
+  
+  "couple_name_1": "Michelle Smith",
+  "couple_name_2": "Thomas Anderson",
+  
+  "rsvp_questions": [
+    {
+      "question_text": "Vegetarian",
+      "accept_option_text": "Yes",
+      "decline_option_text": "No",
+      "allow_maybe": false
+    },
+    {
+      "question_text": "Gluten-free",
+      "accept_option_text": "Yes",
+      "decline_option_text": "No",
+      "allow_maybe": false
+    },
+    {
+      "question_text": "Vegan",
+      "accept_option_text": "Yes",
+      "decline_option_text": "No",
+      "allow_maybe": false
+    }
+  ],
+  
+  "menu_options": [
+    {
+      "menu_number": 1,
+      "appetizer": "Stuffed Mushrooms",
+      "main_course": "Finestra's Omi Wagyu Steak with Garlic mashed Potatto",
+      "dessert": "Glazed Lemon Tart"
+    },
+    {
+      "menu_number": 2,
+      "appetizer": "Garlic Butter Lobster",
+      "main_course": "Filet Mignon in mushroom wine sauce",
+      "dessert": "Chocolate Raspberry Truffle"
+    }
+  ],
+  
+  "event_details": [
+    {
+      "event": "Reception",
+      "time": "5:00 PM"
+    },
+    {
+      "event": "Ceremony",
+      "time": "6:30 PM"
+    },
+    {
+      "event": "Dinner",
+      "time": "9:00 PM"
+    }
+  ],
+  
+  "dress_code": "Formal",
+  "rsvp_deadline": "15th of May",
+  
+  "background_images": {
+    "hero": "https://images.unsplash.com/photo-1519741497674-611481863552?w=800",
+    "event_details": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800",
+    "rsvp": "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
+  },
+  
+  "theme": {
+    "primary_bg": "#E8D5D5",
+    "primary_text": "#4A4A4A",
+    "overlay_bg": "rgba(101, 67, 33, 0.85)"
+  }
+}
+

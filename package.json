@@ -1,0 +1,30 @@
+{
+  "name": "template-microservice",
+  "version": "1.0.0",
+  "description": "Template rendering microservice for RSVP invitations",
+  "main": "render-rsvp.js",
+  "scripts": {
+    "render": "node render-rsvp-v2.js",
+    "render-v1": "node render-rsvp-react.js",
+    "render-old": "node render-rsvp.js",
+    "test": "node render-rsvp-v2.js test-data-v2.json output-v2.html",
+    "test-pdf": "node render-rsvp-v2.js test-data-v2.json output-v2.pdf --pdf"
+  },
+  "keywords": [
+    "template",
+    "rsvp",
+    "rendering",
+    "pdf"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^24.15.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
