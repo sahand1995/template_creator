@@ -117,7 +117,7 @@ function getOrdinalSuffix(day) {
  * @returns {Object} Transformed data for renderer
  */
 function transformRSVPData(sourceData, baseDir = null) {
-    const { event, rsvp_page, background_images } = sourceData;
+    const { event, rsvp_page, background_images, theme } = sourceData;
     
     // Format event date and time
     const eventDateTime = formatEventDateTime(event.start_date);
@@ -177,6 +177,10 @@ function transformRSVPData(sourceData, baseDir = null) {
     
     return {
         mainBackground: heroImage,
+        theme: {
+            boxColour: theme?.box_colour || 'rgba(101,67,33,0.45)',
+            backgroundColour: theme?.background_colour || '#ffffff'
+        },
         eventInfo: {
             eventName: event.name || '',
             eventDate: eventDate || '',

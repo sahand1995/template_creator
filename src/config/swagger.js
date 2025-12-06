@@ -106,6 +106,21 @@ const options = {
                                         event_details: { type: 'string', example: 'https://example.com/event.jpg' },
                                         rsvp: { type: 'string', example: 'https://example.com/rsvp.jpg' }
                                     }
+                                },
+                                theme: {
+                                    type: 'object',
+                                    properties: {
+                                        box_colour: { 
+                                            type: 'string', 
+                                            example: '#8EA8B3',
+                                            description: 'Color code for the box containers in RSVP and Event Details sections'
+                                        },
+                                        background_colour: { 
+                                            type: 'string', 
+                                            example: '#D5F5FB',
+                                            description: 'Background color for the whole page'
+                                        }
+                                    }
                                 }
                             }
                         },

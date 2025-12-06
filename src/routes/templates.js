@@ -58,6 +58,9 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                 hero: "./young-wedding-couple-together-field 1.png"
  *                 event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
  *                 rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
+ *               theme:
+ *                 box_colour: "#8EA8B3"
+ *                 background_colour: "#D5F5FB"
  *             jwt_token: "your-jwt-token-here"
  *     responses:
  *       200:

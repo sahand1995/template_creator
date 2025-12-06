@@ -10,9 +10,25 @@ const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 
 /**
+ * Convert hex color to rgba with opacity
+ */
+function hexToRgba(hex, alpha = 0.45) {
+    if (!hex || !hex.startsWith('#')) return hex;
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
  * Create React components using React.createElement
  */
-function createComponents() {
+function createComponents(theme = {}) {
+    // Convert box color to rgba with opacity if it's a hex color
+    // Using higher opacity (0.7) to make the box more visible and distinct from background
+    const boxColourRaw = theme.boxColour || 'rgba(101,67,33,0.45)';
+    const boxColour = boxColourRaw.startsWith('#') ? hexToRgba(boxColourRaw, 0.7) : boxColourRaw;
+    const backgroundColour = theme.backgroundColour || '#ffffff';
     const BackgroundLayout = ({ children }) => {
         return React.createElement('div', {
             className: 'w-full relative'
@@ -49,7 +65,10 @@ function createComponents() {
 
     const EventInfo = ({ eventInfo }) => {
         return React.createElement('div', {
-            className: 'w-full py-16 px-12 bg-white'
+            className: 'w-full py-16 px-12',
+            style: {
+                backgroundColor: backgroundColour
+            }
         },
             React.createElement('div', {
                 className: 'max-w-4xl mx-auto text-center'
@@ -120,8 +139,9 @@ function createComponents() {
                 },
                     // Container box for Event Details content
                     React.createElement('div', {
-                        className: 'bg-[rgba(101,67,33,0.45)] rounded-lg p-10 mx-auto text-center',
+                        className: 'rounded-lg p-10 mx-auto text-center',
                         style: {
+                            backgroundColor: boxColour,
                             maxWidth: '600px',
                             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
                         }
@@ -163,8 +183,16 @@ function createComponents() {
             return null;
         }
 
+        // Convert hex to rgba with 95% opacity
+        const menuBgColor = backgroundColour.startsWith('#') 
+            ? hexToRgba(backgroundColour, 0.95)
+            : backgroundColour;
+
         return React.createElement('div', {
-            className: 'w-full py-16 px-12 bg-white/95 backdrop-blur-sm'
+            className: 'w-full py-16 px-12 backdrop-blur-sm',
+            style: {
+                backgroundColor: menuBgColor
+            }
         },
             React.createElement('div', {
                 className: 'max-w-4xl mx-auto'
@@ -245,8 +273,9 @@ function createComponents() {
                 },
                     // Container box for RSVP form
                     React.createElement('div', {
-                        className: 'bg-[rgba(101,67,33,0.45)] rounded-lg p-10 mx-auto text-center',
+                        className: 'rounded-lg p-10 mx-auto text-center',
                         style: {
+                            backgroundColor: boxColour,
                             maxWidth: '600px',
                             boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
                         }
@@ -414,7 +443,8 @@ function createComponents() {
  * Render React app to HTML string
  */
 function renderReactApp(transformedData) {
-    const { App } = createComponents();
+    const theme = transformedData.theme || {};
+    const { App } = createComponents(theme);
     const html = ReactDOMServer.renderToString(React.createElement(App, { data: transformedData }));
     return html;
 }
@@ -433,9 +463,12 @@ function loadTemplate() {
 /**
  * Replace template variables
  */
-function renderTemplate(template, reactHtml) {
+function renderTemplate(template, reactHtml, backgroundColour = '#ffffff') {
     let html = template;
     html = html.replace(/\{\{REACT_APP\}\}/g, reactHtml);
+    // Replace body background color
+    html = html.replace(/class="bg-white"/g, `style="background-color: ${backgroundColour}"`);
+    html = html.replace(/bg-white/g, '');
     return html;
 }
 
@@ -623,8 +656,11 @@ async function generateTemplate(transformedData, pdfPath, thumbnailPath) {
     // Load template
     const template = loadTemplate();
     
+    // Get background color from theme
+    const backgroundColour = transformedData.theme?.backgroundColour || '#ffffff';
+    
     // Render template
-    const html = renderTemplate(template, reactHtml);
+    const html = renderTemplate(template, reactHtml, backgroundColour);
     
     // Generate PDF and thumbnail in parallel
     const [pdf, thumbnail] = await Promise.all([
