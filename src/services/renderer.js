@@ -195,7 +195,7 @@ function createComponents(theme = {}) {
             }
         },
             React.createElement('div', {
-                className: 'max-w-4xl mx-auto'
+                className: 'w-full mx-auto'
             },
                 React.createElement('h2', {
                     className: 'text-4xl text-center text-gray-800 mb-12 font-serif font-normal'
@@ -212,23 +212,31 @@ function createComponents(theme = {}) {
                                 className: 'text-2xl font-bold text-gray-800 mb-6 text-center font-serif'
                             }, menu.title),
                             React.createElement('div', {
-                                className: 'space-y-3 flex flex-col items-center'
+                                className: 'w-full mx-auto text-center',
+                                style: { maxWidth: '600px', marginLeft: '125px' }
                             },
-                                Object.entries(menu.items).map(([course, dish], itemIndex) =>
-                                    React.createElement('div', {
-                                        key: itemIndex,
-                                        className: 'flex items-center text-gray-700 text-base font-serif justify-center w-full max-w-md'
-                                    },
-                                        React.createElement('span', {
-                                            className: 'font-semibold mr-4 min-w-[120px]'
-                                        }, course === 'mainCourse' ? 'Main Course' : course.charAt(0).toUpperCase() + course.slice(1)),
-                                        React.createElement('span', {
-                                            className: 'mx-3 opacity-60'
-                                        }, '|'),
-                                        React.createElement('span', {
-                                            className: 'flex-1'
-                                        }, dish)
-                                    )
+                                React.createElement('div', {
+                                    className: 'space-y-3 flex flex-col items-center'
+                                },
+                                    Object.entries(menu.items).map(([course, dish], itemIndex) => {
+                                        const label = course === 'mainCourse' ? 'Main Course' : course.charAt(0).toUpperCase() + course.slice(1);
+                                        return React.createElement('div', {
+                                            key: itemIndex,
+                                            className: 'flex items-center text-gray-700 text-base font-serif'
+                                        },
+                                            React.createElement('span', {
+                                                className: 'font-semibold',
+                                                style: { width: '120px', textAlign: 'right' }
+                                            }, label),
+                                            React.createElement('span', {
+                                                className: 'mx-3 opacity-60'
+                                            }, '|'),
+                                            React.createElement('span', {
+                                                className: '',
+                                                style: { width: '300px', textAlign: 'left' }
+                                            }, dish)
+                                        );
+                                    })
                                 )
                             )
                         )

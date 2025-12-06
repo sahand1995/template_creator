@@ -25,43 +25,179 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/GenerateTemplateRequest'
- *           example:
- *             template_type: "rsvp"
- *             template_sub_type: "v2"
- *             source_data:
- *               event:
- *                 name: "Wedding Celebration"
- *                 category: "Wedding"
- *                 start_date: "2024-04-25T17:00:00Z"
- *                 venue:
- *                   name: "Royal Albert Banquet"
- *                   address_line_1: "134 Maple Street, Newbury hills, California"
- *                 couple_name_1: "Michelle Smith"
- *                 couple_name_2: "Thomas Anderson"
- *               rsvp_page:
- *                 questions:
- *                   - question_text: "Vegetarian"
- *                     accept_option_text: "Yes"
- *                     decline_option_text: "No"
- *                     allow_maybe: false
- *                 menu_options:
- *                   - menu_number: 1
- *                     appetizer: "Stuffed Mushrooms"
- *                     main_course: "Wagyu Steak"
- *                     dessert: "Lemon Tart"
- *                 event_details:
- *                   - event: "Reception"
- *                     time: "5:00 PM"
- *                 dress_code: "Formal"
- *                 rsvp_deadline: "15th of May"
- *               background_images:
- *                 hero: "./young-wedding-couple-together-field 1.png"
- *                 event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
- *                 rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
- *               theme:
- *                 box_colour: "#8EA8B3"
- *                 background_colour: "#D5F5FB"
- *             jwt_token: "your-jwt-token-here"
+ *           examples:
+ *             minimal:
+ *               summary: Minimal data example
+ *               description: Example with minimal data - 1 question, 1 event detail, 1 menu option
+ *               value:
+ *                 template_type: "rsvp"
+ *                 template_sub_type: "v2"
+ *                 source_data:
+ *                   event:
+ *                     name: "Intimate Wedding"
+ *                     category: "Wedding"
+ *                     start_date: "2024-06-15T18:00:00Z"
+ *                     venue:
+ *                       name: "Garden Pavilion"
+ *                       address_line_1: "123 Rose Lane, Spring Valley"
+ *                     couple_name_1: "Emma Wilson"
+ *                     couple_name_2: "James Brown"
+ *                   rsvp_page:
+ *                     questions:
+ *                       - question_text: "Dietary Restrictions"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                     menu_options:
+ *                       - menu_number: 1
+ *                         appetizer: "Caesar Salad"
+ *                         main_course: "Grilled Salmon"
+ *                         dessert: "Chocolate Cake"
+ *                     event_details:
+ *                       - event: "Ceremony"
+ *                         time: "6:00 PM"
+ *                     dress_code: "Semi-Formal"
+ *                     rsvp_deadline: "1st of June"
+ *                   background_images:
+ *                     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800"
+ *                     event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
+ *                     rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
+ *                   theme:
+ *                     box_colour: "#8EA8B3"
+ *                     background_colour: "#D5F5FB"
+ *                 jwt_token: "your-jwt-token-here"
+ *             standard:
+ *               summary: Standard data example
+ *               description: Example with standard data - 3 questions, 3 event details, 2 menu options
+ *               value:
+ *                 template_type: "rsvp"
+ *                 template_sub_type: "v2"
+ *                 source_data:
+ *                   event:
+ *                     name: "Wedding Celebration"
+ *                     category: "Wedding"
+ *                     start_date: "2024-04-25T17:00:00Z"
+ *                     venue:
+ *                       name: "Royal Albert Banquet"
+ *                       address_line_1: "134 Maple Street, Newbury hills, California"
+ *                     couple_name_1: "Michelle Smith"
+ *                     couple_name_2: "Thomas Anderson"
+ *                   rsvp_page:
+ *                     questions:
+ *                       - question_text: "Vegetarian"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                       - question_text: "Allergies"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                       - question_text: "Transportation Needed"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: true
+ *                     menu_options:
+ *                       - menu_number: 1
+ *                         appetizer: "Stuffed Mushrooms"
+ *                         main_course: "Wagyu Steak"
+ *                         dessert: "Lemon Tart"
+ *                       - menu_number: 2
+ *                         appetizer: "Bruschetta"
+ *                         main_course: "Grilled Chicken"
+ *                         dessert: "Tiramisu"
+ *                     event_details:
+ *                       - event: "Reception"
+ *                         time: "5:00 PM"
+ *                       - event: "Dinner"
+ *                         time: "7:00 PM"
+ *                       - event: "Dancing"
+ *                         time: "9:00 PM"
+ *                     dress_code: "Formal"
+ *                     rsvp_deadline: "15th of May"
+ *                   background_images:
+ *                     hero: "./young-wedding-couple-together-field 1.png"
+ *                     event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
+ *                     rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
+ *                   theme:
+ *                     box_colour: "#8EA8B3"
+ *                     background_colour: "#D5F5FB"
+ *                 jwt_token: "your-jwt-token-here"
+ *             extensive:
+ *               summary: Extensive data example
+ *               description: Example with extensive data - 5 questions, 5 event details, 4 menu options
+ *               value:
+ *                 template_type: "rsvp"
+ *                 template_sub_type: "v2"
+ *                 source_data:
+ *                   event:
+ *                     name: "Grand Wedding Celebration"
+ *                     category: "Wedding"
+ *                     start_date: "2024-08-10T16:00:00Z"
+ *                     venue:
+ *                       name: "Luxury Grand Hotel & Resort"
+ *                       address_line_1: "500 Grand Boulevard, Metropolitan City, State 12345"
+ *                     couple_name_1: "Sophia Martinez"
+ *                     couple_name_2: "Alexander Johnson"
+ *                   rsvp_page:
+ *                     questions:
+ *                       - question_text: "Vegetarian Option"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                       - question_text: "Vegan Option"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                       - question_text: "Gluten-Free Option"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                       - question_text: "Food Allergies"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: true
+ *                       - question_text: "Transportation Required"
+ *                         accept_option_text: "Yes"
+ *                         decline_option_text: "No"
+ *                         allow_maybe: false
+ *                     menu_options:
+ *                       - menu_number: 1
+ *                         appetizer: "Lobster Bisque"
+ *                         main_course: "Prime Rib with Roasted Vegetables"
+ *                         dessert: "New York Cheesecake"
+ *                       - menu_number: 2
+ *                         appetizer: "Caprese Salad"
+ *                         main_course: "Herb-Crusted Salmon"
+ *                         dessert: "Chocolate Lava Cake"
+ *                       - menu_number: 3
+ *                         appetizer: "Beef Carpaccio"
+ *                         main_course: "Filet Mignon"
+ *                         dessert: "Crème Brûlée"
+ *                       - menu_number: 4
+ *                         appetizer: "Shrimp Cocktail"
+ *                         main_course: "Chicken Marsala"
+ *                         dessert: "Apple Pie"
+ *                     event_details:
+ *                       - event: "Welcome Reception"
+ *                         time: "4:00 PM"
+ *                       - event: "Ceremony"
+ *                         time: "5:00 PM"
+ *                       - event: "Cocktail Hour"
+ *                         time: "6:00 PM"
+ *                       - event: "Dinner"
+ *                         time: "7:00 PM"
+ *                       - event: "Reception & Dancing"
+ *                         time: "9:00 PM"
+ *                     dress_code: "Black Tie Optional"
+ *                     rsvp_deadline: "1st of August"
+ *                   background_images:
+ *                     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800"
+ *                     event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
+ *                     rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
+ *                   theme:
+ *                     box_colour: "#8EA8B3"
+ *                     background_colour: "#D5F5FB"
+ *                 jwt_token: "your-jwt-token-here"
  *     responses:
  *       200:
  *         description: Template generated successfully
