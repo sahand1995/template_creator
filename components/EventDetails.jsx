@@ -1,6 +1,10 @@
 import React from 'react';
 
 const EventDetails = ({ eventDetails, dressCode, backgroundImage }) => {
+    console.log('EventDetails - eventDetails:', eventDetails);
+    console.log('EventDetails - dressCode:', dressCode);
+    console.log('EventDetails - backgroundImage:', backgroundImage);
+    
     return (
         <div 
             className="w-full min-h-[300px] relative flex items-center justify-center"
@@ -23,19 +27,31 @@ const EventDetails = ({ eventDetails, dressCode, backgroundImage }) => {
                 
                 <h2 className="text-3xl text-white mb-6 text-center font-serif font-semibold">Event Details</h2>
                 
-                <ul className="list-none w-full max-w-md space-y-3">
-                    {eventDetails.map((detail, index) => (
-                        <li key={index} className="flex items-center justify-center py-2 text-white text-lg font-serif">
-                            <span>{detail.event}</span>
-                            <span className="mx-3 opacity-60">|</span>
-                            <span>{detail.time}</span>
-                        </li>
-                    ))}
-                </ul>
-                
-                <div className="w-full max-w-md border-t border-white/30 my-6"></div>
-                
-                <p className="text-lg text-white text-center font-serif">Dress Code: {dressCode}</p>
+                <div 
+                    className="w-full max-w-2xl bg-gray-800/60 rounded-lg p-8 space-y-6 relative z-10"
+                    style={{
+                        backgroundColor: 'rgba(31, 41, 55, 0.8)',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)'
+                    }}
+                >
+                    {console.log('EventDetails - Rendering box container')}
+                    <ul className="list-none w-full space-y-3">
+                        {eventDetails && eventDetails.map ? eventDetails.map((detail, index) => {
+                            console.log('EventDetails - Rendering detail:', detail);
+                            return (
+                                <li key={index} className="flex items-center justify-center py-2 text-white text-lg font-serif">
+                                    <span>{detail.event}</span>
+                                    <span className="mx-3 opacity-60">|</span>
+                                    <span>{detail.time}</span>
+                                </li>
+                            );
+                        }) : <li>No event details</li>}
+                    </ul>
+                    
+                    <div className="w-full border-t border-white/30 my-6"></div>
+                    
+                    <p className="text-lg text-white text-center font-serif">Dress Code: {dressCode}</p>
+                </div>
             </div>
         </div>
     );

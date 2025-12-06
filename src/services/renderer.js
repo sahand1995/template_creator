@@ -113,37 +113,46 @@ function createComponents() {
             }
         },
             React.createElement('div', {
-                className: 'absolute inset-0 bg-black/80 flex items-center justify-center py-16 px-12'
+                className: 'absolute inset-0 bg-black/40 flex items-center justify-center py-16 px-12'
             },
                 React.createElement('div', {
-                    className: 'max-w-2xl w-full text-center'
+                    className: 'max-w-2xl w-full mx-auto'
                 },
-                    React.createElement('h2', {
-                        className: 'text-3xl text-white mb-8 font-serif font-semibold'
-                    }, 'Event Details'),
-                    React.createElement('ul', {
-                        className: 'list-none space-y-4 mb-8'
-                    },
-                        eventDetails.events.map((event, index) =>
-                            React.createElement('li', {
-                                key: index,
-                                className: 'text-white text-lg font-serif flex items-center justify-center'
-                            },
-                                React.createElement('span', null, event.name || event.event),
-                                React.createElement('span', {
-                                    className: 'mx-4 opacity-60'
-                                }, '|'),
-                                React.createElement('span', null, event.time)
-                            )
-                        )
-                    ),
+                    // Container box for Event Details content
                     React.createElement('div', {
-                        className: 'border-t border-white/30 my-6'
-                    }),
-                    eventDetails.dressCode &&
-                    React.createElement('p', {
-                        className: 'text-lg text-white font-serif'
-                    }, `Dress Code: ${eventDetails.dressCode}`)
+                        className: 'bg-[rgba(101,67,33,0.45)] rounded-lg p-10 mx-auto text-center',
+                        style: {
+                            maxWidth: '600px',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.3)'
+                        }
+                    },
+                        React.createElement('h2', {
+                            className: 'text-3xl text-white mb-4 text-center font-serif font-semibold'
+                        }, 'Event Details'),
+                        React.createElement('ul', {
+                            className: 'list-none space-y-4 mb-8'
+                        },
+                            eventDetails.events.map((event, index) =>
+                                React.createElement('li', {
+                                    key: index,
+                                    className: 'text-white text-lg font-serif flex items-center justify-center'
+                                },
+                                    React.createElement('span', null, event.name || event.event),
+                                    React.createElement('span', {
+                                        className: 'mx-4 opacity-60'
+                                    }, '|'),
+                                    React.createElement('span', null, event.time)
+                                )
+                            )
+                        ),
+                        React.createElement('div', {
+                            className: 'border-t border-white/30 my-6'
+                        }),
+                        eventDetails.dressCode &&
+                        React.createElement('p', {
+                            className: 'text-lg text-white font-serif'
+                        }, `Dress Code: ${eventDetails.dressCode}`)
+                    )
                 )
             )
         );
