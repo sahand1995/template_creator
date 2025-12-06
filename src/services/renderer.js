@@ -24,8 +24,6 @@ function createComponents() {
     };
 
     const HeroSection = ({ backgroundImage }) => {
-        console.log(`[RENDER] HeroSection backgroundImage: ${backgroundImage ? backgroundImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${backgroundImage ? backgroundImage.length : 0})`);
-        
         return React.createElement('div', {
             className: 'w-full relative',
             style: {
@@ -103,9 +101,7 @@ function createComponents() {
 
     const EventDetails = ({ eventDetails }) => {
         const bgImage = eventDetails.backgroundImage || '';
-        console.log(`[RENDER] EventDetails backgroundImage: ${bgImage ? bgImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${bgImage.length})`);
         const bgImageUrl = `url('${bgImage}')`;
-        console.log(`[RENDER] EventDetails CSS backgroundImage: ${bgImageUrl.substring(0, 100)}...`);
         
         return React.createElement('div', {
             className: 'w-full min-h-[400px] relative',
@@ -220,9 +216,7 @@ function createComponents() {
         const minHeight = Math.max(600, 400 + (questionCount * 90)); // Base 400px + 90px per question
 
         const bgImage = rsvp.backgroundImage || '';
-        console.log(`[RENDER] RSVP backgroundImage: ${bgImage ? bgImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${bgImage.length})`);
         const bgImageUrl = `url('${bgImage}')`;
-        console.log(`[RENDER] RSVP CSS backgroundImage: ${bgImageUrl.substring(0, 100)}...`);
         
         return React.createElement('div', {
             className: 'w-full relative',
@@ -411,19 +405,8 @@ function createComponents() {
  * Render React app to HTML string
  */
 function renderReactApp(transformedData) {
-    console.log(`[RENDER] Rendering React app with transformed data:`);
-    console.log(`[RENDER]   mainBackground: ${transformedData.mainBackground ? transformedData.mainBackground.substring(0, 50) + '...' : 'EMPTY'} (length: ${transformedData.mainBackground ? transformedData.mainBackground.length : 0})`);
-    console.log(`[RENDER]   eventDetails.backgroundImage: ${transformedData.eventDetails?.backgroundImage ? transformedData.eventDetails.backgroundImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${transformedData.eventDetails?.backgroundImage ? transformedData.eventDetails.backgroundImage.length : 0})`);
-    console.log(`[RENDER]   rsvp.backgroundImage: ${transformedData.rsvp?.backgroundImage ? transformedData.rsvp.backgroundImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${transformedData.rsvp?.backgroundImage ? transformedData.rsvp.backgroundImage.length : 0})`);
-    
     const { App } = createComponents();
     const html = ReactDOMServer.renderToString(React.createElement(App, { data: transformedData }));
-    
-    // Log a sample of the generated HTML to see if images are in there
-    console.log(`[RENDER] Generated HTML length: ${html.length} characters`);
-    const htmlSample = html.substring(0, 1000);
-    console.log(`[RENDER] Generated HTML sample (first 1000 chars):\n${htmlSample}...`);
-    
     return html;
 }
 
@@ -493,8 +476,6 @@ async function generatePDF(html, outputPath) {
                 }))
             };
         });
-        console.log(`[PDF] Images found in page:`, JSON.stringify(imageInfo, null, 2));
-        
         // Wait for all images and fonts to load
         await page.evaluateHandle(() => document.fonts.ready);
         
@@ -526,7 +507,6 @@ async function generatePDF(html, outputPath) {
         
         if (outputPath) {
             fs.writeFileSync(outputPath, pdf);
-            console.log(`PDF generated: ${outputPath}`);
         }
         
         return pdf;
@@ -612,7 +592,6 @@ async function generateThumbnail(html, outputPath, width = 400, height = 600) {
         
         if (outputPath) {
             fs.writeFileSync(outputPath, screenshot);
-            console.log(`Thumbnail generated: ${outputPath}`);
         }
         
         return screenshot;

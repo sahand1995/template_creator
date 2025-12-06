@@ -102,20 +102,6 @@ router.post('/generate_template', async (req, res) => {
         // Validate request body
         const { template_type, template_sub_type, source_data, jwt_token } = req.body;
         
-        // Debug: Log the entire request body structure
-        console.log(`[ROUTE] ========== REQUEST DEBUG ==========`);
-        console.log(`[ROUTE] Full request body keys:`, Object.keys(req.body));
-        console.log(`[ROUTE] source_data type:`, typeof source_data);
-        if (source_data) {
-            console.log(`[ROUTE] source_data keys:`, Object.keys(source_data));
-            console.log(`[ROUTE] Has 'background_images' key?`, 'background_images' in source_data);
-            console.log(`[ROUTE] source_data.background_images:`, source_data.background_images);
-        } else {
-            console.log(`[ROUTE] source_data is null or undefined`);
-        }
-        console.log(`[ROUTE] Full source_data (first 2000 chars):`, JSON.stringify(source_data, null, 2).substring(0, 2000));
-        console.log(`[ROUTE] ====================================`);
-        
         // Validate required fields
         if (!template_type) {
             return res.status(400).json({
@@ -180,14 +166,7 @@ router.post('/generate_template', async (req, res) => {
             // Use project root as base directory for resolving relative image paths
             // __dirname is src/routes, so we go up two levels to get project root
             const baseDir = path.resolve(path.join(__dirname, '..', '..'));
-            console.log(`[ROUTE] baseDir resolved to: ${baseDir}`);
-            console.log(`[ROUTE] Current working directory: ${process.cwd()}`);
-            console.log(`[ROUTE] __dirname: ${__dirname}`);
-            console.log(`[ROUTE] source_data.background_images:`, JSON.stringify(source_data?.background_images, null, 2));
             transformedData = transformRSVPData(source_data, baseDir);
-            console.log(`[ROUTE] Transformed data mainBackground: ${transformedData.mainBackground ? transformedData.mainBackground.substring(0, 50) + '...' : 'EMPTY'}`);
-            console.log(`[ROUTE] Transformed data eventDetails.backgroundImage: ${transformedData.eventDetails?.backgroundImage ? transformedData.eventDetails.backgroundImage.substring(0, 50) + '...' : 'EMPTY'}`);
-            console.log(`[ROUTE] Transformed data rsvp.backgroundImage: ${transformedData.rsvp?.backgroundImage ? transformedData.rsvp.backgroundImage.substring(0, 50) + '...' : 'EMPTY'}`);
         } else {
             return res.status(400).json({
                 success: false,

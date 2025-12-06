@@ -10,22 +10,17 @@ const path = require('path');
  * Convert local image file to base64 data URI
  */
 function imageToDataURI(imagePath, baseDir = null) {
-    console.log(`[IMAGE] Starting conversion - Path: "${imagePath}", baseDir: "${baseDir}"`);
-    
     try {
         // If it's already a data URI or HTTP(S) URL, return as is
         if (!imagePath) {
-            console.log(`[IMAGE] Empty image path, returning empty string`);
             return '';
         }
         
         if (imagePath.startsWith('http')) {
-            console.log(`[IMAGE] HTTP(S) URL detected, returning as-is: ${imagePath.substring(0, 50)}...`);
             return imagePath;
         }
         
         if (imagePath.startsWith('data:')) {
-            console.log(`[IMAGE] Data URI already provided, returning as-is (length: ${imagePath.length})`);
             return imagePath;
         }
         
@@ -33,28 +28,17 @@ function imageToDataURI(imagePath, baseDir = null) {
         let fullPath;
         if (path.isAbsolute(imagePath)) {
             fullPath = imagePath;
-            console.log(`[IMAGE] Absolute path detected: ${fullPath}`);
         } else if (baseDir) {
             fullPath = path.resolve(baseDir, imagePath);
-            console.log(`[IMAGE] Resolved relative path with baseDir: ${fullPath}`);
         } else {
             fullPath = path.resolve(imagePath);
-            console.log(`[IMAGE] Resolved relative path without baseDir: ${fullPath}`);
         }
         
         if (!fs.existsSync(fullPath)) {
-            console.error(`[IMAGE] ❌ FILE NOT FOUND: ${fullPath}`);
-            console.error(`[IMAGE]    Original path: ${imagePath}`);
-            console.error(`[IMAGE]    Base directory: ${baseDir}`);
-            console.error(`[IMAGE]    Current working directory: ${process.cwd()}`);
             return imagePath; // Return original if not found
         }
         
-        console.log(`[IMAGE] ✓ File found: ${fullPath}`);
         const imageBuffer = fs.readFileSync(fullPath);
-        const fileSize = (imageBuffer.length / 1024).toFixed(2);
-        console.log(`[IMAGE] File size: ${fileSize} KB`);
-        
         const ext = path.extname(fullPath).toLowerCase();
         let mimeType = 'image/png';
         
@@ -68,15 +52,10 @@ function imageToDataURI(imagePath, baseDir = null) {
             mimeType = 'image/webp';
         }
         
-        console.log(`[IMAGE] Detected MIME type: ${mimeType} (extension: ${ext})`);
         const base64 = imageBuffer.toString('base64');
         const dataURI = `data:${mimeType};base64,${base64}`;
-        const dataURISize = (dataURI.length / 1024).toFixed(2);
-        console.log(`[IMAGE] ✓ Successfully converted to data URI (${dataURISize} KB)`);
         return dataURI;
     } catch (error) {
-        console.error(`[IMAGE] ❌ ERROR converting image: ${error.message}`);
-        console.error(`[IMAGE]    Stack: ${error.stack}`);
         return imagePath; // Return original on error
     }
 }
@@ -184,24 +163,17 @@ function transformRSVPData(sourceData, baseDir = null) {
     }
     
     // Convert background images to data URIs
-    console.log(`[TRANSFORM] Converting background images...`);
-    console.log(`[TRANSFORM] baseDir: ${baseDir}`);
-    console.log(`[TRANSFORM] background_images object:`, JSON.stringify(background_images, null, 2));
-    
     const heroImage = background_images?.hero 
         ? imageToDataURI(background_images.hero, baseDir)
         : '';
-    console.log(`[TRANSFORM] Hero image result: ${heroImage ? heroImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${heroImage.length})`);
     
     const eventDetailsImage = background_images?.event_details
         ? imageToDataURI(background_images.event_details, baseDir)
         : '';
-    console.log(`[TRANSFORM] Event details image result: ${eventDetailsImage ? eventDetailsImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${eventDetailsImage.length})`);
     
     const rsvpImage = background_images?.rsvp
         ? imageToDataURI(background_images.rsvp, baseDir)
         : '';
-    console.log(`[TRANSFORM] RSVP image result: ${rsvpImage ? rsvpImage.substring(0, 50) + '...' : 'EMPTY'} (length: ${rsvpImage.length})`);
     
     return {
         mainBackground: heroImage,
