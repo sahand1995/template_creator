@@ -119,6 +119,11 @@ function getOrdinalSuffix(day) {
 function transformRSVPData(sourceData, baseDir = null) {
     const { event, rsvp_page, background_images, theme } = sourceData;
     
+    // Set baseDir to project root if not provided
+    if (!baseDir) {
+        baseDir = path.resolve(path.join(__dirname, '..', '..'));
+    }
+    
     // Format event date and time
     const eventDateTime = formatEventDateTime(event.start_date);
     const [eventDate, eventTime] = eventDateTime.split(' | ').map(s => s.trim());
@@ -167,13 +172,12 @@ function transformRSVPData(sourceData, baseDir = null) {
         ? imageToDataURI(background_images.hero, baseDir)
         : '';
     
-    const eventDetailsImage = background_images?.event_details
-        ? imageToDataURI(background_images.event_details, baseDir)
-        : '';
+    // Use assets images for EventDetails and RSVP sections
+    const eventDetailsImagePath = path.join(baseDir, 'assets', 'rsvp', 'rsvp_event_details.png');
+    const rsvpImagePath = path.join(baseDir, 'assets', 'rsvp', 'rsvp_questions.png');
     
-    const rsvpImage = background_images?.rsvp
-        ? imageToDataURI(background_images.rsvp, baseDir)
-        : '';
+    const eventDetailsImage = imageToDataURI(eventDetailsImagePath, baseDir);
+    const rsvpImage = imageToDataURI(rsvpImagePath, baseDir);
     
     return {
         mainBackground: heroImage,

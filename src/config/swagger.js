@@ -102,9 +102,11 @@ const options = {
                                 background_images: {
                                     type: 'object',
                                     properties: {
-                                        hero: { type: 'string', example: 'https://example.com/hero.jpg' },
-                                        event_details: { type: 'string', example: 'https://example.com/event.jpg' },
-                                        rsvp: { type: 'string', example: 'https://example.com/rsvp.jpg' }
+                                        hero: { 
+                                            type: 'string', 
+                                            example: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800',
+                                            description: 'Hero image for the invitation header. EventDetails and RSVP section images are automatically loaded from assets folder.'
+                                        }
                                     }
                                 },
                                 theme: {

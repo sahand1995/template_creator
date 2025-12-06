@@ -60,8 +60,6 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                     rsvp_deadline: "1st of June"
  *                   background_images:
  *                     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800"
- *                     event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
- *                     rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
  *                   theme:
  *                     box_colour: "#8EA8B3"
  *                     background_colour: "#D5F5FB"
@@ -116,8 +114,6 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                     rsvp_deadline: "15th of May"
  *                   background_images:
  *                     hero: "./young-wedding-couple-together-field 1.png"
- *                     event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
- *                     rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
  *                   theme:
  *                     box_colour: "#8EA8B3"
  *                     background_colour: "#D5F5FB"
@@ -192,8 +188,6 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                     rsvp_deadline: "1st of August"
  *                   background_images:
  *                     hero: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800"
- *                     event_details: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800"
- *                     rsvp: "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800"
  *                   theme:
  *                     box_colour: "#8EA8B3"
  *                     background_colour: "#D5F5FB"
