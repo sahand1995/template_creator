@@ -458,6 +458,21 @@ function renderReactApp(transformedData) {
 }
 
 /**
+ * Render thumbnail HTML (only HeroSection and EventInfo)
+ */
+function renderThumbnailApp(transformedData) {
+    const theme = transformedData.theme || {};
+    const { BackgroundLayout, HeroSection, EventInfo } = createComponents(theme);
+    const html = ReactDOMServer.renderToString(
+        React.createElement(BackgroundLayout, {},
+            React.createElement(HeroSection, { backgroundImage: transformedData.mainBackground }),
+            React.createElement(EventInfo, { eventInfo: transformedData.eventInfo })
+        )
+    );
+    return html;
+}
+
+/**
  * Load HTML template
  */
 function loadTemplate() {
@@ -582,10 +597,10 @@ async function generateThumbnail(html, outputPath, width = 400, height = 600) {
     try {
         const page = await browser.newPage();
         
-        // Set viewport for thumbnail
+        // Set viewport width first, height will be adjusted after content loads
         await page.setViewport({
             width: width,
-            height: height,
+            height: 2000, // Large initial height to ensure all content is visible
             deviceScaleFactor: 2 // Higher DPI for better quality
         });
         
@@ -628,16 +643,56 @@ async function generateThumbnail(html, outputPath, width = 400, height = 600) {
         // Additional wait for rendering
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Take screenshot
+        // Get the actual height of HeroSection and EventInfo content
+        const { contentHeight, contentWidth } = await page.evaluate(() => {
+            const root = document.getElementById('root');
+            if (!root) return { contentHeight: 600, contentWidth: 400 };
+            
+            // Get the bounding box of all content in root
+            const children = Array.from(root.children || []);
+            if (children.length === 0) {
+                return { 
+                    contentHeight: Math.round(root.scrollHeight || 600), 
+                    contentWidth: Math.round(root.scrollWidth || 400) 
+                };
+            }
+            
+            let minY = Infinity;
+            let maxY = 0;
+            let maxWidth = 0;
+            
+            children.forEach(child => {
+                const rect = child.getBoundingClientRect();
+                minY = Math.min(minY, rect.top);
+                maxY = Math.max(maxY, rect.bottom);
+                maxWidth = Math.max(maxWidth, rect.width);
+            });
+            
+            const totalHeight = maxY - minY;
+            return { 
+                contentHeight: Math.round(totalHeight || root.scrollHeight || 600), 
+                contentWidth: Math.round(maxWidth || root.scrollWidth || 400) 
+            };
+        });
+        
+        // Ensure width and height are valid integers
+        const finalWidth = Math.round(contentWidth) || width;
+        const finalHeight = Math.round(contentHeight) || height;
+        
+        // Update viewport to match content dimensions
+        await page.setViewport({
+            width: finalWidth,
+            height: finalHeight,
+            deviceScaleFactor: 2
+        });
+        
+        // Wait a bit for viewport to adjust
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Take screenshot of the full content (HeroSection and EventInfo)
         const screenshot = await page.screenshot({
             type: 'png',
-            fullPage: false, // Only capture viewport
-            clip: {
-                x: 0,
-                y: 0,
-                width: width,
-                height: height
-            }
+            fullPage: true // Capture the full page content
         });
         
         if (outputPath) {
@@ -658,8 +713,11 @@ async function generateThumbnail(html, outputPath, width = 400, height = 600) {
  * @returns {Promise<{pdf: Buffer, thumbnail: Buffer}>}
  */
 async function generateTemplate(transformedData, pdfPath, thumbnailPath) {
-    // Render React app
+    // Render React app for PDF (full content)
     const reactHtml = renderReactApp(transformedData);
+    
+    // Render thumbnail HTML (only HeroSection and EventInfo)
+    const thumbnailHtml = renderThumbnailApp(transformedData);
     
     // Load template
     const template = loadTemplate();
@@ -667,13 +725,14 @@ async function generateTemplate(transformedData, pdfPath, thumbnailPath) {
     // Get background color from theme
     const backgroundColour = transformedData.theme?.backgroundColour || '#ffffff';
     
-    // Render template
+    // Render templates
     const html = renderTemplate(template, reactHtml, backgroundColour);
+    const thumbnailTemplate = renderTemplate(template, thumbnailHtml, backgroundColour);
     
     // Generate PDF and thumbnail in parallel
     const [pdf, thumbnail] = await Promise.all([
         generatePDF(html, pdfPath),
-        generateThumbnail(html, thumbnailPath)
+        generateThumbnail(thumbnailTemplate, thumbnailPath)
     ]);
     
     return { pdf, thumbnail };
