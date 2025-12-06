@@ -52,7 +52,9 @@ npx puppeteer browsers install chrome
 2. Create `.env` file in the root directory:
 ```bash
 PORT=3001
-DJANGO_BASE_URL=http://localhost:8000
+DJANGO_BASE_URL=https://dev-jupiera-api.darkube.app
+DJANGO_AUTH_EMAIL=jalali.sahand1995@gmail.com
+DJANGO_AUTH_PASSWORD=admin1234
 NODE_ENV=development
 ```
 
@@ -83,6 +85,7 @@ Generate a template (PDF and thumbnail) and upload to Django.
 {
   "template_type": "rsvp",
   "template_sub_type": "v2",
+  "generate_type": "pdf",
   "source_data": {
     "event": {
       "name": "Wedding Celebration",
@@ -128,12 +131,13 @@ Generate a template (PDF and thumbnail) and upload to Django.
       "rsvp_deadline": "15th of May"
     },
     "background_images": {
-      "hero": "https://example.com/hero.jpg",
-      "event_details": "https://example.com/event-details.jpg",
-      "rsvp": "https://example.com/rsvp.jpg"
+      "hero": "https://example.com/hero.jpg"
+    },
+    "theme": {
+      "box_colour": "#8EA8B3",
+      "background_colour": "#D5F5FB"
     }
-  },
-  "jwt_token": "your-jwt-token-here"
+  }
 }
 ```
 
@@ -141,9 +145,8 @@ Generate a template (PDF and thumbnail) and upload to Django.
 ```json
 {
   "success": true,
-  "pdf_attachment_id": 123,
-  "thumbnail_attachment_id": 124,
-  "message": "Template generated successfully"
+  "attachment_id": 123,
+  "message": "PDF generated and uploaded successfully"
 }
 ```
 
@@ -187,7 +190,7 @@ The service validates:
    - `template_type`: Must be "rsvp"
    - `template_sub_type`: Required (e.g., "v2", "premium", "basic")
    - `source_data`: Required object
-   - `jwt_token`: Required for Django authentication
+   - `generate_type`: Must be either "pdf" or "thumbnail"
 
 2. **Event Data:**
    - `event.name`: Required string
@@ -244,7 +247,9 @@ http://localhost:3001/api-docs
 ## Environment Variables
 
 - `PORT`: Server port (default: 3001)
-- `DJANGO_BASE_URL`: Django backend URL (default: http://localhost:8000)
+- `DJANGO_BASE_URL`: Django backend URL (default: https://dev-jupiera-api.darkube.app)
+- `DJANGO_AUTH_EMAIL`: Email for Django authentication (default: jalali.sahand1995@gmail.com)
+- `DJANGO_AUTH_PASSWORD`: Password for Django authentication (default: admin1234)
 - `NODE_ENV`: Environment (development/production)
 
 ## Testing
@@ -254,7 +259,9 @@ http://localhost:3001/api-docs
 Create a `.env` file in the root directory:
 ```bash
 PORT=3001
-DJANGO_BASE_URL=http://localhost:8000
+DJANGO_BASE_URL=https://dev-jupiera-api.darkube.app
+DJANGO_AUTH_EMAIL=jalali.sahand1995@gmail.com
+DJANGO_AUTH_PASSWORD=admin1234
 NODE_ENV=development
 ```
 
@@ -382,9 +389,8 @@ npm run test-pdf
 ```json
 {
   "success": true,
-  "pdf_attachment_id": 123,
-  "thumbnail_attachment_id": 124,
-  "message": "Template generated successfully"
+  "attachment_id": 123,
+  "message": "PDF generated and uploaded successfully"
 }
 ```
 
@@ -409,7 +415,7 @@ npm run test-pdf
 ```json
 {
   "success": false,
-  "error": "Failed to upload files to Django: Django API error (401): Unauthorized"
+  "error": "Failed to upload file to Django: Django API error (401): Unauthorized"
 }
 ```
 
@@ -419,11 +425,11 @@ npm run test-pdf
 - [ ] Health endpoint returns 200
 - [ ] Template generation with valid data returns 200
 - [ ] Validation errors return 400 with proper error messages
-- [ ] Invalid JWT token returns 502
+- [ ] Authentication failures return 502
 - [ ] Missing required fields return 400
-- [ ] PDF and thumbnail files are generated
-- [ ] Files are uploaded to Django (if Django is running)
-- [ ] Temporary files are cleaned up after request
+- [ ] PDF or thumbnail file is generated based on generate_type
+- [ ] File is uploaded to Django (if Django is running)
+- [ ] Attachment ID is returned in response
 
 ## Integration with Django
 
@@ -432,13 +438,15 @@ The Django backend should:
 1. Call `POST /generate_template` with:
    - Event data from `Event` model
    - RSVP data from `RSVPPage`, `RSVPQuestion`, `RSVPMenuOption` models
-   - JWT token for authentication
+   - `generate_type`: Either "pdf" or "thumbnail" to specify which file type to generate
 
-2. Receive attachment IDs for:
-   - Generated PDF
-   - Generated thumbnail
+2. Receive attachment ID for:
+   - Generated PDF (if `generate_type` is "pdf")
+   - Generated thumbnail (if `generate_type` is "thumbnail")
 
-3. Use attachment IDs to create `Archive` records
+3. Use attachment ID to create `Archive` records
+
+**Note**: The microservice handles authentication automatically using credentials from environment variables. No JWT token needs to be passed in the request.
 
 ## Error Handling
 
@@ -473,8 +481,9 @@ Temporary files are automatically cleaned up on success or error.
 
 ### Django Upload Fails
 - Verify `DJANGO_BASE_URL` is correct
-- Check JWT token is valid and not expired
+- Check `DJANGO_AUTH_EMAIL` and `DJANGO_AUTH_PASSWORD` are correct
 - Ensure Django attachment endpoint is accessible
+- Verify authentication endpoint `/api/v1/user/login/` is accessible
 
 ### Validation Errors
 - Check request body matches expected format

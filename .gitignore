@@ -6,4 +6,5 @@ output.pdf
 .DS_Store
 .env
 *.cache
+output/
 

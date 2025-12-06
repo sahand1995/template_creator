@@ -498,10 +498,10 @@ function renderTemplate(template, reactHtml, backgroundColour = '#ffffff') {
 /**
  * Generate PDF from HTML using Puppeteer
  * @param {string} html - HTML content
- * @param {string} outputPath - Output file path
+ * @param {string} outputPath - Output file path (optional, for local saving)
  * @returns {Promise<Buffer>} PDF buffer
  */
-async function generatePDF(html, outputPath) {
+async function generatePDF(html, outputPath = null) {
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -570,6 +570,7 @@ async function generatePDF(html, outputPath) {
             preferCSSPageSize: false // Important: use explicit width/height
         });
         
+        // Optionally save to file if outputPath is provided
         if (outputPath) {
             fs.writeFileSync(outputPath, pdf);
         }
@@ -583,12 +584,12 @@ async function generatePDF(html, outputPath) {
 /**
  * Generate thumbnail (PNG) from HTML using Puppeteer
  * @param {string} html - HTML content
- * @param {string} outputPath - Output file path
+ * @param {string} outputPath - Output file path (optional, for local saving)
  * @param {number} width - Thumbnail width (default: 400)
  * @param {number} height - Thumbnail height (default: 600)
  * @returns {Promise<Buffer>} PNG buffer
  */
-async function generateThumbnail(html, outputPath, width = 400, height = 600) {
+async function generateThumbnail(html, outputPath = null, width = 400, height = 600) {
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -695,6 +696,7 @@ async function generateThumbnail(html, outputPath, width = 400, height = 600) {
             fullPage: true // Capture the full page content
         });
         
+        // Optionally save to file if outputPath is provided
         if (outputPath) {
             fs.writeFileSync(outputPath, screenshot);
         }
@@ -743,7 +745,9 @@ module.exports = {
     generateThumbnail,
     generateTemplate,
     renderReactApp,
-    renderTemplate
+    renderThumbnailApp,
+    renderTemplate,
+    loadTemplate
 };
 
 

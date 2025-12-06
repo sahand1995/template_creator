@@ -9,8 +9,9 @@ const path = require('path');
 const os = require('os');
 const { validateRSVPData, validateTemplateType, ValidationError } = require('../services/validator');
 const { transformRSVPData } = require('../utils/dataTransformer');
-const { generateTemplate } = require('../services/renderer');
+const { generatePDF, generateThumbnail, renderReactApp, renderThumbnailApp, loadTemplate, renderTemplate } = require('../services/renderer');
 const { uploadFile } = require('../services/attachment');
+const { getToken } = require('../services/auth');
 const { VALIDATION_MESSAGES } = require('../config/constants');
 
 /**
@@ -63,7 +64,7 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                   theme:
  *                     box_colour: "#8EA8B3"
  *                     background_colour: "#D5F5FB"
- *                 jwt_token: "your-jwt-token-here"
+ *                 generate_type: "pdf"
  *             standard:
  *               summary: Standard data example
  *               description: Example with standard data - 3 questions, 3 event details, 2 menu options
@@ -117,7 +118,7 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                   theme:
  *                     box_colour: "#8EA8B3"
  *                     background_colour: "#D5F5FB"
- *                 jwt_token: "your-jwt-token-here"
+ *                 generate_type: "thumbnail"
  *             extensive:
  *               summary: Extensive data example
  *               description: Example with extensive data - 5 questions, 5 event details, 4 menu options
@@ -191,7 +192,7 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *                   theme:
  *                     box_colour: "#8EA8B3"
  *                     background_colour: "#D5F5FB"
- *                 jwt_token: "your-jwt-token-here"
+ *                 generate_type: "pdf"
  *     responses:
  *       200:
  *         description: Template generated successfully
@@ -201,9 +202,8 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *               $ref: '#/components/schemas/GenerateTemplateResponse'
  *             example:
  *               success: true
- *               pdf_attachment_id: 123
- *               thumbnail_attachment_id: 124
- *               message: "Template generated successfully"
+ *               attachment_id: 123
+ *               message: "PDF generated and uploaded successfully"
  *       400:
  *         description: Validation error
  *         content:
@@ -228,12 +228,9 @@ const { VALIDATION_MESSAGES } = require('../config/constants');
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/generate_template', async (req, res) => {
-    let pdfPath = null;
-    let thumbnailPath = null;
-    
     try {
         // Validate request body
-        const { template_type, template_sub_type, source_data, jwt_token } = req.body;
+        const { template_type, template_sub_type, source_data, generate_type } = req.body;
         
         // Validate required fields
         if (!template_type) {
@@ -257,13 +254,20 @@ router.post('/generate_template', async (req, res) => {
             });
         }
         
-        // jwt_token is optional now (commented out Django upload)
-        // if (!jwt_token) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         error: VALIDATION_MESSAGES.JWT_TOKEN_REQUIRED
-        //     });
-        // }
+        // Validate generate_type parameter
+        if (!generate_type) {
+            return res.status(400).json({
+                success: false,
+                error: 'generate_type is required. Must be "pdf" or "thumbnail"'
+            });
+        }
+        
+        if (generate_type !== 'pdf' && generate_type !== 'thumbnail') {
+            return res.status(400).json({
+                success: false,
+                error: 'generate_type must be either "pdf" or "thumbnail"'
+            });
+        }
         
         // Validate template type
         try {
@@ -307,61 +311,93 @@ router.post('/generate_template', async (req, res) => {
             });
         }
         
-        // Generate output file paths (save locally)
-        const outputDir = path.join(__dirname, '..', '..', 'output');
-        if (!fs.existsSync(outputDir)) {
-            fs.mkdirSync(outputDir, { recursive: true });
+        // Get Django configuration from environment (required for security)
+        const djangoBaseUrl = process.env.DJANGO_BASE_URL;
+        const djangoEmail = process.env.DJANGO_AUTH_EMAIL;
+        const djangoPassword = process.env.DJANGO_AUTH_PASSWORD;
+        
+        // Validate required environment variables
+        if (!djangoBaseUrl) {
+            return res.status(500).json({
+                success: false,
+                error: 'DJANGO_BASE_URL environment variable is not set'
+            });
         }
         
-        const timestamp = Date.now();
-        pdfPath = path.join(outputDir, `template-${timestamp}.pdf`);
-        thumbnailPath = path.join(outputDir, `template-${timestamp}.png`);
+        if (!djangoEmail) {
+            return res.status(500).json({
+                success: false,
+                error: 'DJANGO_AUTH_EMAIL environment variable is not set'
+            });
+        }
         
-        // Generate PDF and thumbnail
-        await generateTemplate(transformedData, pdfPath, thumbnailPath);
+        if (!djangoPassword) {
+            return res.status(500).json({
+                success: false,
+                error: 'DJANGO_AUTH_PASSWORD environment variable is not set'
+            });
+        }
         
-        // TODO: Commented out for now - will re-enable after fixing image loading issue
-        // Get Django base URL from environment
-        // const djangoBaseUrl = process.env.DJANGO_BASE_URL || 'http://localhost:8000';
+        // Get authentication token
+        let jwtToken;
+        try {
+            jwtToken = await getToken(djangoBaseUrl, djangoEmail, djangoPassword);
+        } catch (error) {
+            return res.status(502).json({
+                success: false,
+                error: `Failed to authenticate with Django: ${error.message}`
+            });
+        }
         
-        // Upload files to Django
-        // let pdfAttachmentId, thumbnailAttachmentId;
-        // try {
-        //     [pdfAttachmentId, thumbnailAttachmentId] = await Promise.all([
-        //         uploadFile(pdfPath, jwt_token, djangoBaseUrl),
-        //         uploadFile(thumbnailPath, jwt_token, djangoBaseUrl)
-        //     ]);
-        // } catch (error) {
-        //     return res.status(502).json({
-        //         success: false,
-        //         error: `Failed to upload files to Django: ${error.message}`
-        //     });
-        // }
+        // Load template and prepare HTML
+        const template = loadTemplate();
+        const backgroundColour = transformedData.theme?.backgroundColour || '#ffffff';
         
-        // Files are saved locally - no cleanup needed
+        let fileBuffer;
+        let filename;
+        let contentType;
         
-        // Return success response with file paths
+        // Generate the requested file type
+        if (generate_type === 'pdf') {
+            // Generate PDF
+            const reactHtml = renderReactApp(transformedData);
+            const html = renderTemplate(template, reactHtml, backgroundColour);
+            fileBuffer = await generatePDF(html);
+            filename = `template-${Date.now()}.pdf`;
+            contentType = 'application/pdf';
+        } else if (generate_type === 'thumbnail') {
+            // Generate thumbnail
+            const thumbnailHtml = renderThumbnailApp(transformedData);
+            const thumbnailTemplate = renderTemplate(template, thumbnailHtml, backgroundColour);
+            fileBuffer = await generateThumbnail(thumbnailTemplate);
+            filename = `template-${Date.now()}.png`;
+            contentType = 'image/png';
+        }
+        
+        // Upload file to Django attachment API
+        let attachmentId;
+        try {
+            attachmentId = await uploadFile(fileBuffer, jwtToken, djangoBaseUrl, filename, contentType);
+        } catch (error) {
+            return res.status(502).json({
+                success: false,
+                error: `Failed to upload file to Django: ${error.message}`
+            });
+        }
+        
+        // Return success response with attachment ID
         return res.status(200).json({
             success: true,
-            pdf_path: pdfPath,
-            thumbnail_path: thumbnailPath,
-            pdf_url: `/output/${path.basename(pdfPath)}`,
-            thumbnail_url: `/output/${path.basename(thumbnailPath)}`,
-            message: 'Template generated successfully and saved locally'
-            // pdf_attachment_id: pdfAttachmentId,
-            // thumbnail_attachment_id: thumbnailAttachmentId,
+            attachment_id: attachmentId,
+            message: `${generate_type === 'pdf' ? 'PDF' : 'Thumbnail'} generated and uploaded successfully`
         });
         
     } catch (error) {
-        // Keep files on error for debugging - don't clean up
         console.error('Template generation error:', error);
         
         return res.status(500).json({
             success: false,
-            error: error.message || 'Internal server error',
-            // Include file paths if they exist (for debugging)
-            pdf_path: pdfPath && fs.existsSync(pdfPath) ? pdfPath : null,
-            thumbnail_path: thumbnailPath && fs.existsSync(thumbnailPath) ? thumbnailPath : null
+            error: error.message || 'Internal server error'
         });
     }
 });

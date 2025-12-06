@@ -25,7 +25,7 @@ const options = {
             schemas: {
                 GenerateTemplateRequest: {
                     type: 'object',
-                    required: ['template_type', 'template_sub_type', 'source_data', 'jwt_token'],
+                    required: ['template_type', 'template_sub_type', 'source_data', 'generate_type'],
                     properties: {
                         template_type: {
                             type: 'string',
@@ -36,6 +36,12 @@ const options = {
                             type: 'string',
                             example: 'v2',
                             description: 'Sub-type of the template (e.g., v2, premium, basic)'
+                        },
+                        generate_type: {
+                            type: 'string',
+                            enum: ['pdf', 'thumbnail'],
+                            example: 'pdf',
+                            description: 'Type of file to generate and upload to Django attachment API'
                         },
                         source_data: {
                             type: 'object',
@@ -125,11 +131,6 @@ const options = {
                                     }
                                 }
                             }
-                        },
-                        jwt_token: {
-                            type: 'string',
-                            example: 'your-jwt-token-here',
-                            description: 'JWT token for Django API authentication'
                         }
                     }
                 },
@@ -137,9 +138,8 @@ const options = {
                     type: 'object',
                     properties: {
                         success: { type: 'boolean', example: true },
-                        pdf_attachment_id: { type: 'integer', example: 123 },
-                        thumbnail_attachment_id: { type: 'integer', example: 124 },
-                        message: { type: 'string', example: 'Template generated successfully' }
+                        attachment_id: { type: 'integer', example: 123 },
+                        message: { type: 'string', example: 'PDF generated and uploaded successfully' }
                     }
                 },
                 ErrorResponse: {
